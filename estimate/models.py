@@ -1,4 +1,4 @@
-import decimal
+from decimal import Decimal
 
 from django.db import models
 from django.db.models import Sum
@@ -7,7 +7,7 @@ from polymorphic.models import PolymorphicModel
 
 class Estimate(models.Model):
     report = models.CharField(max_length=10)
-    dealer_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    dealer_discount = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 
     is_vattable = models.BooleanField(default=True)
 
@@ -19,27 +19,27 @@ class Estimate(models.Model):
             if self.dealer_discount:
                 if self.dealer_discount > 0:
                     discount = items_total * (self.dealer_discount / 100)
-                    return items_total - discount
+                    return (items_total - discount).quantize(Decimal('0.01'))
             else:
-                return items_total
+                return items_total.quantize(Decimal('0.01'))
 
     @property
     def open_market_parts(self):
         items = self.item_set.instance_of(OpenMarketPart)
         if items:
-            return items.aggregate(Sum("amount"))['amount__sum']
+            return (items.aggregate(Sum("amount"))['amount__sum']).quantize(Decimal('0.01'))
 
     @property
     def contribution_parts(self):
         items = self.item_set.instance_of(ContributionPart)
         if items:
-            return items.aggregate(Sum("amount"))['amount__sum']
+            return (items.aggregate(Sum("amount"))['amount__sum']).quantize(Decimal('0.01'))
 
     @property
     def other_costs(self):
         items = self.item_set.instance_of(OtherCost)
         if items:
-            return items.aggregate(Sum("amount"))['amount__sum']
+            return (items.aggregate(Sum("amount"))['amount__sum']).quantize(Decimal('0.01'))
 
     def __str__(self):
         return self.report
@@ -56,20 +56,19 @@ class Estimate(models.Model):
         items_total = sum([value for value in items.values() if value])
         vat = 0
         if self.is_vattable:
-            vat_perc = decimal.Decimal(0.16)
-            vat = items_total * vat_perc
+            vat = items_total * Decimal(0.16)
+        items["estimate_total"] = items_total
         items['vat'] = vat
-        items["estimate_total"] = (items_total + vat)
+        items['estimate_total'] = items_total + vat
         return items
 
     @property
     def vat(self):
-        if self.is_vattable:
-            return round(self.summary['vat'], 2)
+        return round(self.summary['vat'], 2).quantize(Decimal('0.01'))
 
     @property
     def estimate_total(self):
-        return round(self.summary['estimate_total'], 0)
+        return round(self.summary['estimate_total'], 0).quantize(Decimal('0.01'))
 
 
 class Item(PolymorphicModel):
@@ -83,7 +82,7 @@ class Item(PolymorphicModel):
 
 class Part(Item):
     quantity = models.IntegerField()
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2, )
 
 
 class DealerPart(Part):
@@ -101,7 +100,7 @@ class OpenMarketPart(Part):
     def save(self, *args, **kwargs):
         if not self.negotiated:
             self.negotiated = self.unit_cost
-        self.amount = (self.negotiated * self.quantity)
+        self.amount = self.negotiated * self.quantity
         super(OpenMarketPart, self).save(*args, **kwargs)
 
 
