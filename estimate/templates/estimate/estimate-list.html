@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Estimates</title>
+</head>
+<body>
+<a href="{% url 'create-estimate' %}">New Estimate</a>
+<table>
+    <thead>
+    <tr>
+        <th>Estimate</th>
+        <th>Dealer Parts</th>
+        <th>Open Market Parts</th>
+        <th>Contribution Parts</th>
+        <th>Other Costs</th>
+        <th>VAT</th>
+        <th>Estimate Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for estimate in estimates %}
+        <tr>
+
+            {% if estimate.report %}
+               <td> <a href="{% url 'estimate' pk=estimate.pk %}">{{ estimate.report }}</a></td>
+            {% endif %}
+            {% if estimate.dealer_parts %}
+                <td>{{ estimate.dealer_parts }}</td>
+            {% endif %}
+            {% if estimate.open_market_parts %}
+                <td>{{ estimate.open_market_parts }}</td>
+            {% endif %}
+            {% if estimate.contribution_parts %}
+                <td>{{ estimate.contribution_parts }}</td>
+            {% endif %}
+            {% if estimate.other_costs %}
+                <td>{{ estimate.other_costs }}</td>
+            {% endif %}
+            {% if estimate.vat %}
+                <td>{{ estimate.vat }}</td>
+            {% endif %}
+            <td>
+                {{ estimate.estimate_total }}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+</body>
+</html>

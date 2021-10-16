@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Estimate</title>
+</head>
+<body>
+<form method="post">
+    <a href="{% url 'estimate-list' %}">All Estimates</a>
+    <h4>{{ estimate.report }}</h4>
+    {{ estimate_total.report }}
+    <p>Dealer Parts: {{ estimate.dealer_parts }}</p>
+    <p>Open Mart Part: {{ estimate.open_market_parts }}</p>
+    <p>Contribution Part: {{ estimate.contribution_parts }}</p>
+    <p>Other Costs: {{ estimate.other_costs }}</p>
+    <p>Estimate Total: {{ estimate.estimate_total }}</p>
+</form>
+</body>
+</html>

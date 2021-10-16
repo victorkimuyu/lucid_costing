@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 from django.db.models import Sum
+from django.urls import reverse
 from polymorphic.models import PolymorphicModel
 
 
@@ -9,19 +10,18 @@ class Estimate(models.Model):
     report = models.CharField(max_length=10)
     dealer_discount = models.DecimalField(max_digits=4, decimal_places=2, null=True, blank=True)
 
-    is_vattable = models.BooleanField(default=True)
+    vattable = models.BooleanField(default=True)
 
     @property
     def dealer_parts(self):
         items = self.item_set.instance_of(DealerPart)
         if items:
             items_total = items.aggregate(Sum("amount"))['amount__sum']
-            if self.dealer_discount:
-                if self.dealer_discount > 0:
-                    discount = items_total * (self.dealer_discount / 100)
-                    return (items_total - discount).quantize(Decimal('0.01'))
-            else:
+            if not self.dealer_discount:
                 return items_total.quantize(Decimal('0.01'))
+            if self.dealer_discount > 0:
+                discount = items_total * (self.dealer_discount / 100)
+                return (items_total - discount).quantize(Decimal('0.01'))
 
     @property
     def open_market_parts(self):
@@ -53,9 +53,9 @@ class Estimate(models.Model):
             'other_costs': self.other_costs
         }
 
-        items_total = sum([value for value in items.values() if value])
-        vat = 0
-        if self.is_vattable:
+        items_total = sum(value for value in items.values() if value)
+        vat = Decimal(0)
+        if self.vattable:
             vat = items_total * Decimal(0.16)
         items["estimate_total"] = items_total
         items['vat'] = vat
@@ -64,11 +64,15 @@ class Estimate(models.Model):
 
     @property
     def vat(self):
-        return round(self.summary['vat'], 2).quantize(Decimal('0.01'))
+        if self.vattable:
+            return round(self.summary['vat'], 2).quantize(Decimal('0.01'))
 
     @property
     def estimate_total(self):
         return round(self.summary['estimate_total'], 0).quantize(Decimal('0.01'))
+
+    def get_absolute_url(self):
+        return reverse('estimate', kwargs={"pk": self.pk})
 
 
 class Item(PolymorphicModel):
@@ -82,7 +86,7 @@ class Item(PolymorphicModel):
 
 class Part(Item):
     quantity = models.IntegerField()
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2, )
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class DealerPart(Part):
