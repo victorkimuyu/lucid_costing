@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from estimate.models import DealerPart, OpenMarketPart, OtherCost, Estimate, ContributionPart
+from estimate.models import DealerPart, OpenMarketPart, OtherCost, Estimate, ContributionPart, Item
 
 
 # @admin.register(DealerPart)
@@ -55,3 +55,8 @@ class EstimateAdmin(admin.ModelAdmin):
     inlines = [DealerPartInline, OpenMarketPartInline, ContributionPartInline, OpenMarketPartInline, OtherCostInline]
     list_display = ['report', 'dealer_parts', 'open_market_parts', 'contribution_parts', 'other_costs',
                     'vat', 'estimate_total']
+
+
+@admin.register(Item)
+class ItemAdmin(admin.ModelAdmin):
+    pass

@@ -1,11 +1,14 @@
+import decimal
+
 from django.db import models
 from django.db.models import Sum
+from polymorphic.managers import PolymorphicManager
 from polymorphic.models import PolymorphicModel
 
 
 class Estimate(models.Model):
     report = models.CharField(max_length=10)
-    dealer_discount = models.IntegerField(null=True, blank=True)
+    dealer_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     is_vattable = models.BooleanField(default=True)
 
@@ -54,25 +57,42 @@ class Estimate(models.Model):
         items_total = sum([value for value in items.values() if value])
         vat = 0
         if self.is_vattable:
-            vat = items_total * 0.16
-        items["estimate_total"] = items_total
+            vat_perc = decimal.Decimal(0.16)
+            vat = items_total * vat_perc
         items['vat'] = vat
-        items['estimate_total'] = items_total + vat
+        items["estimate_total"] = (items_total + vat)
         return items
 
     @property
     def vat(self):
-        return self.summary['vat']
+        if self.is_vattable:
+            return round(self.summary['vat'], 2)
 
     @property
     def estimate_total(self):
-        return self.summary['estimate_total']
+        return round(self.summary['estimate_total'], 0)
+
+
+class ItemManager(PolymorphicManager):
+    def get_dealerparts(self):
+        return self.instance_of(DealerPart)
+
+    def get_openmarketparts(self):
+        return self.instance_of(ContributionPart)
+
+    def get_contributionparts(self):
+        return self.instance_of(ContributionPart)
+
+    def get_othercosts(self):
+        return self.instance_of(OtherCost)
 
 
 class Item(PolymorphicModel):
     estimate = models.ForeignKey(Estimate, on_delete=models.PROTECT)
     description = models.CharField(max_length=50)
-    amount = models.IntegerField()
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+
+    items = ItemManager()
 
     def __str__(self):
         return self.description
@@ -80,7 +100,7 @@ class Item(PolymorphicModel):
 
 class Part(Item):
     quantity = models.IntegerField()
-    unit_cost = models.FloatField()
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
 
 class DealerPart(Part):
@@ -93,7 +113,7 @@ class DealerPart(Part):
 
 
 class OpenMarketPart(Part):
-    negotiated = models.FloatField(null=True, blank=True)
+    negotiated = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.negotiated:
@@ -103,8 +123,8 @@ class OpenMarketPart(Part):
 
 
 class ContributionPart(Part):
-    negotiated = models.FloatField(null=True, blank=True)
-    contrib_perc = models.FloatField(default=0)
+    negotiated = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    contrib_perc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def contrib_amount(self):
