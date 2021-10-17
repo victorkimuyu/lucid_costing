@@ -11,22 +11,105 @@
     <style>
 
         body {
-            font-family: "IBM Plex Sans", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+            font-family: "Roobert", "Lucida Grande", "DejaVu Sans", "Bitstream Vera Sans", Verdana, Arial, sans-serif;
+            background-color: #f9fafe;
+            color: #42a26b;
+        }
+        .eyebrow {
+            margin-bottom: 0.2em;
+            color: #4f4f4f;
+            padding: 0.025em;
+            font-size: 70%;
+            font-weight: 600;
+            letter-spacing: 2px;
         }
 
         .table {
             width: 21cm;
+            color: #323ca9;
+        }
+
+        .table-bordered {
+            border: 1px solid #37474f;
+        }
+
+        .table-bordered thead td, .table-bordered thead th {
+            border: none;
+        {#border-bottom: 1px solid #37474f;#}
+        }
+
+        .table-bordered td, .table-bordered th {
+            border: none;
+        {#border-bottom: 1px solid #37474f;#}
         }
 
         .table td, .table th {
-            padding: .25em;
+            padding: .375em .45em;
+
+            border: none;
+        }
+
+        .table th, .table thead tr th {
+            padding: 0.3em .4em;
+            font-size: 105%;
+            font-weight: 600;
+            text-align: right;
+            border-bottom: solid 1px #000;
+        }
+
+        .table .currency {
+            text-align: right;
+            padding-right: 0.5em;
+        }
+
+        .table td, .table th {
+            vertical-align: bottom;
+            letter-spacing: 0.025em;
+        }
+
+        .subtotal {
+            font-size: 100%;
+            font-weight: 600;
+            text-align: right;
+            border-bottom: solid 2px #333333;
+
+        }
+
+        .subtotal td{
+            background-color: #fff;
+        }
+
+        .subtotal .currency {
+            font-weight: 700;
+            font-size: 130%;
+            text-align: right;
+            padding-bottom: 0.2em;
+        }
+
+        .estimate {
+            background-color: #fff;
+            padding-bottom: 5em;
+            padding-top: 4em;
+        }
+
+        .estimate table {
+            margin-bottom: 0;
+        }
+
+        .estimate-subheading {
+            text-align: left;
+            font-size: 110%;
+            font-weight: 600;
+            margin-top: 0;
+            padding-top: 1.5em;
+            padding-left: 0.35em;
+            margin-bottom: 0.3em;
         }
     </style>
 </head>
 <body>
-<div class="container">
+<div class="container estimate">
     {% block estimate %}
-
     {% endblock %}
 </div>
 </body>

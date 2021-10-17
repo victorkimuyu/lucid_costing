@@ -68,6 +68,15 @@ class Estimate(models.Model):
             return round(self.summary['vat'], 2).quantize(Decimal('0.01'))
 
     @property
+    def get_discount(self):
+        if self.dealer_discount:
+            items = self.item_set.instance_of(DealerPart)
+            items_total = items.aggregate(Sum("amount"))['amount__sum']
+            return items_total * (self.dealer_discount / 100).quantize(Decimal('0.01'))
+        else:
+            return None
+
+    @property
     def estimate_total(self):
         return round(self.summary['estimate_total'], 0).quantize(Decimal('0.01'))
 
@@ -128,14 +137,14 @@ class ContributionPart(Item):
     quantity = models.IntegerField()
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     negotiated = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    contrib_perc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    contrib_perc = models.IntegerField()
 
     @property
     def contrib_amount(self):
         if not self.negotiated:
             self.negotiated = self.unit_cost
         if self.contrib_perc:
-            return (self.contrib_perc / 100) * self.negotiated * self.quantity
+            return (Decimal(self.contrib_perc / 100) * (self.negotiated * self.quantity)).quantize(Decimal('0.01'))
         else:
             return 0
 
