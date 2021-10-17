@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -5,18 +6,93 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Estimate</title>
+    {% block title %}
+        <title>Estimate - {{ estimate.report }}</title>
+
+    {% endblock %}
 </head>
 <body>
-<form method="post">
-    <a href="{% url 'estimate-list' %}">All Estimates</a>
-    <h4>{{ estimate.report }}</h4>
-    {{ estimate_total.report }}
-    <p>Dealer Parts: {{ estimate.dealer_parts }}</p>
-    <p>Open Mart Part: {{ estimate.open_market_parts }}</p>
-    <p>Contribution Part: {{ estimate.contribution_parts }}</p>
-    <p>Other Costs: {{ estimate.other_costs }}</p>
-    <p>Estimate Total: {{ estimate.estimate_total }}</p>
-</form>
+{% block estimate %}
+    <h5>Dealer Parts</h5>
+    <table class="table small table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Cost</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in dealer_parts %}
+            <tr>
+                <td></td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_cost }}</td>
+                <td>{{ item.amount }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+    <h5>Open Market Parts</h5>
+    <table class="table small table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Cost</th>
+            <th>Negotiated</th>
+            <th>Amount</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in open_market_parts %}
+            <tr>
+                <td></td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_cost }}</td>
+                <td>{{ item.negotiated }}</td>
+                <td>{{ item.amount }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+    <h5>Contribution Parts</h5>
+    <table class="table small table-bordered">
+        <thead>
+        <tr>
+            <th></th>
+            <th>Item</th>
+            <th>Qty</th>
+            <th>Unit Cost</th>
+            <th>Negotiated</th>
+            <th>Cont. %</th>
+            <th>Contrib.</th>
+            <th>Balance</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in contribution_parts %}
+            <tr>
+                <td></td>
+                <td>{{ item.description }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.unit_cost }}</td>
+                <td>{{ item.negotiated }}</td>
+                <td>{{ item.contrib_perc }}</td>
+                <td>{{ item.contrib_amount }}</td>
+                <td>{{ item.amount }}</td>
+            </tr>
+        {% endfor %}
+
+        </tbody>
+    </table>
+{% endblock %}
 </body>
 </html>

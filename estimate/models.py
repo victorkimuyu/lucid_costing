@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Sum
 from django.urls import reverse
-from polymorphic.models import PolymorphicModel
+from polymorphic.models import PolymorphicModel, PolymorphicManager
 
 
 class Estimate(models.Model):
@@ -75,21 +75,35 @@ class Estimate(models.Model):
         return reverse('estimate', kwargs={"pk": self.pk})
 
 
+class ItemManager(PolymorphicManager):
+    def get_dealerparts(self):
+        return self.get_queryset().instance_of(DealerPart)
+
+    def get_openmarketparts(self):
+        return self.get_queryset().instance_of(OpenMarketPart)
+
+    def get_contributionparts(self):
+        return self.get_queryset().instance_of(OpenMarketPart)
+
+    def get_othercosts(self):
+        return self.get_queryset().instance_of(OtherCost)
+
+
 class Item(PolymorphicModel):
     estimate = models.ForeignKey(Estimate, on_delete=models.PROTECT)
     description = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
+    objects = ItemManager()
+
     def __str__(self):
         return self.description
 
 
-class Part(Item):
+class DealerPart(Item):
     quantity = models.IntegerField()
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
-
-class DealerPart(Part):
     def save(self, *args, **kwargs):
         cost = self.unit_cost
         qty = self.quantity
@@ -98,7 +112,9 @@ class DealerPart(Part):
         super(DealerPart, self).save(*args, **kwargs)
 
 
-class OpenMarketPart(Part):
+class OpenMarketPart(Item):
+    quantity = models.IntegerField()
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     negotiated = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def save(self, *args, **kwargs):
@@ -108,7 +124,9 @@ class OpenMarketPart(Part):
         super(OpenMarketPart, self).save(*args, **kwargs)
 
 
-class ContributionPart(Part):
+class ContributionPart(Item):
+    quantity = models.IntegerField()
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     negotiated = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     contrib_perc = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 

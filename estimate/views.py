@@ -1,7 +1,7 @@
 from django.views import generic
 from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
 
-from .models import DealerPart, OpenMarketPart, ContributionPart, OtherCost, Estimate
+from .models import OtherCost, OpenMarketPart, ContributionPart, DealerPart, Estimate
 
 
 class DealerPartInline(InlineFormSetFactory):
@@ -40,10 +40,20 @@ class UpdateEstimateView(UpdateWithInlinesView):
 
 
 class EstimateDetailView(generic.DetailView):
-    context_object_name = "estimate"
     model = Estimate
+    context_object_name = "estimate"
     template_name = 'estimate/estimate-detail.html'
-    
+
+    def get_context_data(self, **kwargs):
+        estimate = self.get_object()
+        context = super().get_context_data(**kwargs)
+        context["report"] = estimate.report
+        context['dealer_parts'] = estimate.item_set.instance_of(DealerPart)
+        context['open_market_parts'] = estimate.item_set.instance_of(OpenMarketPart)
+        context['contribution_parts'] = estimate.item_set.instance_of(ContributionPart)
+        context['other_costs'] = estimate.item_set.instance_of(OtherCost)
+        return context
+
 
 class EstimateListView(generic.ListView):
     model = Estimate
