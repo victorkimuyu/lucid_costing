@@ -43,12 +43,18 @@
                 </tr>
                 </tfoot>
             {% else %}
-                <td style="width: 20%;">
-                </td>
-                <td>
-                    <p class="subtotal-eyebrow">SUBTOTAL</p>
-                    <h5>{{ estimate.dealer_parts }}</h5>
-                </td>
+                <tfoot>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <p class="subtotal-eyebrow">SUBTOTAL</p>
+                        <h5>{{ estimate.dealer_parts }}</h5>
+                    </td>
+                </tr>
+                </tfoot>
             {% endif %}
         </table>
     {% endif %}
@@ -143,14 +149,14 @@
         <table style="width: 60%;" class="table small">
             <thead>
             <tr>
-                <th class="item-index"></th>
+                <th style="width: 7%"></th>
                 <th style="text-align: left;">Description</th>
                 <th style="width: 14%; text-align: right;">Amount</th>
             </tr>
             </thead>
             {% for item in other_costs %}
                 <tr>
-                    <td></td>
+                    <td class="item-index"></td>
                     <td>{{ item.description }}</td>
                     <td class="item-cost">{{ item.amount }}</td>
                 </tr>
@@ -168,6 +174,8 @@
             </tfoot>
         </table>
     {% endif %}
+
+    <h6 style="padding-top: 3em;">Summation</h6>
     <table class="table small" id="summation">
         <tr>
             {% if dealer_parts %}
@@ -202,7 +210,7 @@
             {% endif %}
             <td>
             <td style="text-align: right; vertical-align: bottom;">
-                <h4 style="">{{ estimate.estimate_total }}</h4>
+                <h4 style="font-weight: 700; width:auto; padding-top: 0.4em; border-top:1px solid #000;">{{ estimate.estimate_total }}</h4>
             </td>
         </tr>
     </table>
