@@ -1,5 +1,6 @@
 from django.views import generic
-from extra_views import CreateWithInlinesView, UpdateWithInlinesView, InlineFormSetFactory
+from extra_views import InlineFormSetFactory
+from string import ascii_lowercase as letters
 
 from .models import OtherCost, OpenMarketPart, ContributionPart, DealerPart, Estimate
 
@@ -24,19 +25,11 @@ class OtherCostInline(InlineFormSetFactory):
     fields = ['description', 'amount']
 
 
-class CreateEstimateView(CreateWithInlinesView):
+class CreateEstimateView(generic.CreateView):
     model = Estimate
     inlines = [DealerPartInline, OpenMarketPartInline, ContributionPartInline, OtherCostInline]
     fields = ['report', 'vattable', 'dealer_discount']
     template_name = 'estimate/estimate.html'
-
-
-class UpdateEstimateView(UpdateWithInlinesView):
-    model = Estimate
-    context_object_name = 'estimate'
-    template_name = 'estimate/estimate.html'
-    fields = ['report', 'vattable', 'dealer_discount']
-    inlines = [DealerPartInline, OpenMarketPartInline, ContributionPartInline, OtherCostInline]
 
 
 class EstimateDetailView(generic.DetailView):
