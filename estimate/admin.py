@@ -5,25 +5,25 @@ from estimate.models import DealerPart, OtherCost, ContributionPart, OpenMarketP
 
 class DealerPartInline(admin.TabularInline):
     model = DealerPart
-    fields = ['description', 'quantity', 'unit_cost', 'amount']
+    fields = ['item', 'quantity', 'unit_price', 'amount']
     readonly_fields = ['amount']
 
 
 class OpenMarketPartInline(admin.TabularInline):
     model = OpenMarketPart
-    fields = ['description', 'quantity', 'unit_cost', 'negotiated', 'amount']
+    fields = ['item', 'quantity', 'unit_price', 'negotiated_price', 'amount']
     readonly_fields = ['amount']
 
 
 class ContributionPartInline(admin.TabularInline):
     model = ContributionPart
-    fields = ['description', 'quantity', 'unit_cost', 'negotiated', 'contrib_perc', 'amount']
+    fields = ['item', 'quantity', 'unit_price', 'negotiated_price', 'contrib_perc', 'amount']
     readonly_fields = ['amount']
 
 
 class OtherCostInline(admin.TabularInline):
     model = OtherCost
-    fields = ['description', 'amount']
+    fields = ['item', 'amount']
 
 
 @admin.register(Estimate)

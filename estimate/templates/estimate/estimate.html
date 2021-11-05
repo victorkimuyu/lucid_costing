@@ -1,22 +1,22 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-<div>
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% crispy form %}
+{% block estimate %}
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p}}
-        {% for formset in inlines %}
-            {{ formset }}
-        {% endfor %}
-        <input type="submit" value="Submit"/>
+        {{ form.as_table }}
+        <h3>Dealer Parts</h3>
+        {{ management_form }}
+        {{ dealer_part_formset }}
+        <h3>Open Market Parts</h3>
+        {{ management_form }}
+        {{ openmarket_part_formset }}
+        <h3>Contribution Parts</h3>
+        {{ management_form }}
+        {{ contribution_part_formset }}
+        <h3>Other Costs</h3>
+        {{ management_form }}
+        {{ other_cost_formset }}
+        <input type="submit" value="Save">
     </form>
-</div>
-</body>
-</html>
+{% endblock %}

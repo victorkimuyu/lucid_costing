@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'estimate.apps.EstimateConfig',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -117,6 +118,8 @@ USE_THOUSAND_SEPARATOR = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = '/static/'
+MEDIA_ROOT = '/media/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field

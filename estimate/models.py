@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 from django.db.models import Sum
 from django.urls import reverse
-from polymorphic.models import PolymorphicModel, PolymorphicManager
+from polymorphic.models import PolymorphicModel
 
 
 class Estimate(models.Model):
@@ -18,7 +18,7 @@ class Estimate(models.Model):
     def dealer_parts(self):
         items = self.item_set.instance_of(DealerPart)
         if items:
-            items_total = items.aggregate(Sum("amount"))["amount__sum"]
+            items_total = sum(item.amount for item in items)
             if not self.dealer_discount:
                 return items_total.quantize(Decimal("0.01"))
             if self.dealer_discount > 0:
@@ -73,56 +73,42 @@ class Estimate(models.Model):
     @property
     def vat(self):
         if self.vattable:
-            return round(self.summary["vat"], 2).quantize(Decimal("0.01"))
+            result = self.summary["vat"]
+            return result.quantize(Decimal("0.01"))
 
     @property
     def get_discount(self):
         if self.dealer_discount:
             items = self.item_set.instance_of(DealerPart)
             items_total = items.aggregate(Sum("amount"))["amount__sum"]
-            return items_total * ((self.dealer_discount / 100).quantize(Decimal("0.01")))
+            discount = items_total * (self.dealer_discount / 100)
+            return discount.quantize(Decimal("0.01"))
         else:
             return None
 
     @property
     def estimate_total(self):
-        return round(self.summary["estimate_total"], 0).quantize(Decimal("0.01"))
+        return self.summary["estimate_total"].quantize(Decimal("0.01"))
 
     def get_absolute_url(self):
-        return reverse("estimate", kwargs={"pk": self.pk})
-
-
-class ItemManager(PolymorphicManager):
-    def get_dealerparts(self):
-        return self.get_queryset().instance_of(DealerPart)
-
-    def get_openmarketparts(self):
-        return self.get_queryset().instance_of(OpenMarketPart)
-
-    def get_contributionparts(self):
-        return self.get_queryset().instance_of(OpenMarketPart)
-
-    def get_othercosts(self):
-        return self.get_queryset().instance_of(OtherCost)
+        return reverse("estimate-detail", kwargs={"pk": self.pk})
 
 
 class Item(PolymorphicModel):
     estimate = models.ForeignKey(Estimate, on_delete=models.PROTECT)
-    description = models.CharField(max_length=50)
+    item = models.CharField(max_length=50)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
 
-    objects = ItemManager()
-
     def __str__(self):
-        return self.description
+        return self.item
 
 
 class DealerPart(Item):
     quantity = models.IntegerField()
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
 
     def save(self, *args, **kwargs):
-        cost = self.unit_cost
+        cost = self.unit_price
         qty = self.quantity
         self.amount = qty * cost
 
@@ -131,41 +117,41 @@ class DealerPart(Item):
 
 class OpenMarketPart(Item):
     quantity = models.IntegerField()
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    negotiated = models.DecimalField(
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    negotiated_price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
 
     def save(self, *args, **kwargs):
-        if not self.negotiated:
-            self.negotiated = self.unit_cost
-        self.amount = self.negotiated * self.quantity
+        if not self.negotiated_price:
+            self.negotiated_price = self.unit_price
+        self.amount = self.negotiated_price * self.quantity
         super(OpenMarketPart, self).save(*args, **kwargs)
 
 
 class ContributionPart(Item):
     quantity = models.IntegerField()
-    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
-    negotiated = models.DecimalField(
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    negotiated_price = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     contrib_perc = models.IntegerField()
 
     @property
     def contrib_amount(self):
-        if not self.negotiated:
-            self.negotiated = self.unit_cost
+        if not self.negotiated_price:
+            self.negotiated_price = self.unit_price
         if self.contrib_perc:
             return (
-                    Decimal(self.contrib_perc / 100) * (self.negotiated * self.quantity)
+                    Decimal(self.contrib_perc / 100) * (self.negotiated_price * self.quantity)
             ).quantize(Decimal("0.01"))
         else:
             return 0
 
     def save(self, *args, **kwargs):
-        if not self.negotiated:
-            self.negotiated = self.unit_cost
-        self.amount = (self.negotiated * self.quantity) - self.contrib_amount
+        if not self.negotiated_price:
+            self.negotiated_price = self.unit_price
+        self.amount = (self.negotiated_price * self.quantity) - self.contrib_amount
         super(ContributionPart, self).save(*args, **kwargs)
 
 
