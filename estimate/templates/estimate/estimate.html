@@ -1,22 +1,47 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load crispy_forms_tags %}
-{% crispy form %}
-{% block estimate %}
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_table }}
-        <h3>Dealer Parts</h3>
-        {{ management_form }}
-        {{ dealer_part_formset }}
-        <h3>Open Market Parts</h3>
-        {{ management_form }}
-        {{ openmarket_part_formset }}
-        <h3>Contribution Parts</h3>
-        {{ management_form }}
-        {{ contribution_part_formset }}
-        <h3>Other Costs</h3>
-        {{ management_form }}
-        {{ other_cost_formset }}
-        <input type="submit" value="Save">
-    </form>
+{% load crispy_forms_filters %}
+{% load crispy_forms_utils %}
+{% load i18n %}
+{% block title %}
+    {% if estimate.report %}
+        {{ estimate.report }} | Edit Estimate
+    {% else %}
+        {{ "Create Estimate" }}
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                {{ form | crispy }}
+            </div>
+            <div>
+                <h4>Dealer Parts</h4>
+                <div>
+                    {{ dealer_parts | crispy }}
+                </div>
+            </div>
+            <div>
+                <h4>Open Market Parts</h4>
+                <div>
+                    {{ openmarket_parts | crispy }}
+                </div>
+            </div>
+            <div>
+                <h4>Contribution Parts</h4>
+                <div>
+                    {{ contribution_parts | crispy }}
+                </div>
+            </div>
+            <div>
+                <h4>Other Costs</h4>
+                <div>
+                    {{ other_costs | crispy }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save</button>
+        </form>
+    </div>
 {% endblock %}

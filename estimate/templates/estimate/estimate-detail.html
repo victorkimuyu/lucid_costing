@@ -3,216 +3,218 @@
 {% block title %}
     <title>{{ estimate.report }}</title>
 {% endblock %}
-{% block estimate %}
-    {% if dealer_parts %}
-        <h6>Dealer Parts</h6>
-        <table class="table small">
-            <thead>
-            <tr style="text-align: right">
-                <th class="item-index"></th>
-                <th style="text-align: left">Description</th>
-                <th class="qty" style="text-align: center;">Qty</th>
-                <th>Unit Cost</th>
-                <th>Amount</th>
-            </tr>
-            </thead>
-            {% for item in dealer_parts %}
-                <tr>
-                    <td>{{ forloop.counter }}.</td>
-                    <td>{{ item.description }}</td>
-                    <td style="text-align: center;">{{ item.quantity }}</td>
-                    <td class="item-cost">{{ item.unit_price }}</td>
-                    <td class="item-cost">{{ item.amount }}</td>
+{% block content %}
+    <div class="container">
+        {% if dealer_parts %}
+            <h6>Dealer Parts</h6>
+            <table class="table small">
+                <thead>
+                <tr style="text-align: right">
+                    <th class="item-index"></th>
+                    <th style="text-align: left">Description</th>
+                    <th class="qty" style="text-align: center;">Qty</th>
+                    <th>Unit Cost</th>
+                    <th>Amount</th>
                 </tr>
-            {% endfor %}
-            {% if estimate.dealer_discount %}
+                </thead>
+                {% for item in dealer_parts %}
+                    <tr>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>{{ item.description }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td class="item-cost">{{ item.unit_price }}</td>
+                        <td class="item-cost">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+                {% if estimate.dealer_discount %}
+                    <tfoot>
+                    <tr style="padding-top:1em;">
+                        <td class="item-index"></td>
+                        <td></td>
+                        <td></td>
+                        <td style="width: 20%;">
+                            <p style="text-align: left; margin-bottom: 0.15em; color: #727FA2;">
+                                Less {{ estimate.dealer_discount }}%
+                                discount</p>
+                            <h6>{{ estimate.get_discount }}</h6>
+                        </td>
+                        <td>
+                            <p class="subtotal-eyebrow">SUBTOTAL</p>
+                            <h5>{{ estimate.dealer_parts }}</h5>
+                        </td>
+                    </tr>
+                    </tfoot>
+                {% else %}
+                    <tfoot>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td>
+                            <p class="subtotal-eyebrow">SUBTOTAL</p>
+                            <h5>{{ estimate.dealer_parts }}</h5>
+                        </td>
+                    </tr>
+                    </tfoot>
+                {% endif %}
+            </table>
+        {% endif %}
+        {% if dealer_parts %}
+            <h6>Open market Parts</h6>
+            <table class="table small">
+                <thead>
+                <tr style="text-align: right">
+                    <th class="item-index"></th>
+                    <th style="text-align: left">Description</th>
+                    <th class="qty" style="text-align: center;">Qty</th>
+                    <th>Quoted</th>
+                    <th>Negotiated</th>
+                    <th>Amount</th>
+                </tr>
+                </thead>
+                {% for item in open_market_parts %}
+                    <tr>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>{{ item.description }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td class="item-cost">{{ item.unit_price }}</td>
+                        <td class="item-cost">{{ item.negotiated }}</td>
+                        <td class="item-cost">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+
                 <tfoot>
                 <tr style="padding-top:1em;">
                     <td class="item-index"></td>
                     <td></td>
                     <td></td>
+                    <td></td>
                     <td style="width: 20%;">
-                        <p style="text-align: left; margin-bottom: 0.15em; color: #727FA2;">
-                            Less {{ estimate.dealer_discount }}%
-                            discount</p>
-                        <h6>{{ estimate.get_discount }}</h6>
                     </td>
                     <td>
                         <p class="subtotal-eyebrow">SUBTOTAL</p>
-                        <h5>{{ estimate.dealer_parts }}</h5>
+                        <h5>{{ estimate.open_market_parts }}</h5>
                     </td>
                 </tr>
                 </tfoot>
-            {% else %}
+            </table>
+        {% endif %}
+        {% if contribution_parts %}
+            <h6>Contribution parts</h6>
+            <table class="table small">
+                <thead>
+                <tr style="text-align: right">
+                    <th class="item-index"></th>
+                    <th style="text-align: left; width: 40%">Description</th>
+                    <th class="qty" style="text-align: center;">Qty</th>
+                    <th>Quoted</th>
+                    <th>Negotiated</th>
+                    <th style="width: 10%; text-align: center;">Contr. %</th>
+                    <th>Amount</th>
+                    <th>Balance</th>
+                </tr>
+                </thead>
+                {% for item in contribution_parts %}
+                    <tr>
+                        <td>{{ forloop.counter }}.</td>
+                        <td>{{ item.description }}</td>
+                        <td style="text-align: center;">{{ item.quantity }}</td>
+                        <td class="item-cost">{{ item.unit_price }}</td>
+                        <td class="item-cost">{{ item.negotiated }}</td>
+                        <td style="width: 10%; text-align: center;">{{ item.contrib_perc }}</td>
+                        <td class="item-cost">{{ item.contrib_amount }}</td>
+                        <td class="item-cost">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+
+                <tfoot>
+                <tr style="padding-top:1em;">
+                    <td class="item-index"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td style="width: 20%;">
+                    </td>
+                    <td>
+                        <p class="subtotal-eyebrow">SUBTOTAL</p>
+                        <h5>{{ estimate.contribution_parts }}</h5>
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        {% endif %}
+        {% if other_costs %}
+            <h6>Add</h6>
+            <table style="width: 60%;" class="table small">
+                <thead>
+                <tr>
+                    <th style="width: 7%"></th>
+                    <th style="text-align: left;">Description</th>
+                    <th style="width: 14%; text-align: right;">Amount</th>
+                </tr>
+                </thead>
+                {% for item in other_costs %}
+                    <tr>
+                        <td class="item-index">{{ forloop.counter | roman }}.</td>
+                        <td>{{ item.description }}</td>
+                        <td class="item-cost">{{ item.amount }}</td>
+                    </tr>
+                {% endfor %}
+
                 <tfoot>
                 <tr>
                     <td></td>
                     <td></td>
-                    <td></td>
-                    <td></td>
                     <td>
                         <p class="subtotal-eyebrow">SUBTOTAL</p>
-                        <h5>{{ estimate.dealer_parts }}</h5>
+                        <h5>{{ estimate.other_costs }}</h5>
                     </td>
                 </tr>
                 </tfoot>
-            {% endif %}
-        </table>
-    {% endif %}
-    {% if dealer_parts %}
-        <h6>Open market Parts</h6>
-        <table class="table small">
-            <thead>
-            <tr style="text-align: right">
-                <th class="item-index"></th>
-                <th style="text-align: left">Description</th>
-                <th class="qty" style="text-align: center;">Qty</th>
-                <th>Quoted</th>
-                <th>Negotiated</th>
-                <th>Amount</th>
-            </tr>
-            </thead>
-            {% for item in open_market_parts %}
-                <tr>
-                    <td>{{ forloop.counter }}.</td>
-                    <td>{{ item.description }}</td>
-                    <td style="text-align: center;">{{ item.quantity }}</td>
-                    <td class="item-cost">{{ item.unit_price }}</td>
-                    <td class="item-cost">{{ item.negotiated }}</td>
-                    <td class="item-cost">{{ item.amount }}</td>
-                </tr>
-            {% endfor %}
+            </table>
+        {% endif %}
 
-            <tfoot>
-            <tr style="padding-top:1em;">
-                <td class="item-index"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style="width: 20%;">
-                </td>
-                <td>
-                    <p class="subtotal-eyebrow">SUBTOTAL</p>
-                    <h5>{{ estimate.open_market_parts }}</h5>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
-    {% endif %}
-    {% if contribution_parts %}
-        <h6>Contribution parts</h6>
-        <table class="table small">
-            <thead>
-            <tr style="text-align: right">
-                <th class="item-index"></th>
-                <th style="text-align: left; width: 40%">Description</th>
-                <th class="qty" style="text-align: center;">Qty</th>
-                <th>Quoted</th>
-                <th>Negotiated</th>
-                <th style="width: 10%; text-align: center;">Contr. %</th>
-                <th>Amount</th>
-                <th>Balance</th>
-            </tr>
-            </thead>
-            {% for item in contribution_parts %}
-                <tr>
-                    <td>{{ forloop.counter }}.</td>
-                    <td>{{ item.description }}</td>
-                    <td style="text-align: center;">{{ item.quantity }}</td>
-                    <td class="item-cost">{{ item.unit_price }}</td>
-                    <td class="item-cost">{{ item.negotiated }}</td>
-                    <td style="width: 10%; text-align: center;">{{ item.contrib_perc }}</td>
-                    <td class="item-cost">{{ item.contrib_amount }}</td>
-                    <td class="item-cost">{{ item.amount }}</td>
-                </tr>
-            {% endfor %}
-
-            <tfoot>
-            <tr style="padding-top:1em;">
-                <td class="item-index"></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td style="width: 20%;">
-                </td>
-                <td>
-                    <p class="subtotal-eyebrow">SUBTOTAL</p>
-                    <h5>{{ estimate.contribution_parts }}</h5>
-                </td>
-            </tr>
-            </tfoot>
-        </table>
-    {% endif %}
-    {% if other_costs %}
-        <h6>Add</h6>
-        <table style="width: 60%;" class="table small">
-            <thead>
+        <h6 style="padding-top: 3em;">Summation</h6>
+        <table class="table small" id="summation">
             <tr>
-                <th style="width: 7%"></th>
-                <th style="text-align: left;">Description</th>
-                <th style="width: 14%; text-align: right;">Amount</th>
-            </tr>
-            </thead>
-            {% for item in other_costs %}
-                <tr>
-                    <td class="item-index">{{ forloop.counter | roman }}.</td>
-                    <td>{{ item.description }}</td>
-                    <td class="item-cost">{{ item.amount }}</td>
-                </tr>
-            {% endfor %}
-
-            <tfoot>
-            <tr>
-                <td></td>
-                <td></td>
+                {% if dealer_parts %}
+                    <td class="summation-item">
+                        <p class="subtotal-eyebrow">DEALER PARTS</p>
+                        <h5>{{ estimate.dealer_parts }}</h5>
+                    </td>
+                {% endif %}
+                {% if open_market_parts %}
+                    <td class="summation-item">
+                        <p class="subtotal-eyebrow">OPEN MARKET</p>
+                        <h5>{{ estimate.open_market_parts }}</h5>
+                    </td>
+                {% endif %}
+                {% if contribution_parts %}
+                    <td class="summation-item">
+                        <p class="subtotal-eyebrow">CONTRIBUTION</p>
+                        <h5>{{ estimate.contribution_parts }}</h5>
+                    </td>
+                {% endif %}
+                {% if other_costs %}
+                    <td class="summation-item">
+                        <p class="subtotal-eyebrow">OTHER COSTS</p>
+                        <h5>{{ estimate.other_costs }}</h5>
+                    </td>
+                {% endif %}
+                {% if estimate.vattable %}
+                    <td class="summation-item">
+                        <p class="subtotal-eyebrow">VAT</p>
+                        <h5>{{ estimate.vat }}</h5>
+                    </td>
+                {% endif %}
                 <td>
-                    <p class="subtotal-eyebrow">SUBTOTAL</p>
-                    <h5>{{ estimate.other_costs }}</h5>
+                <td style="text-align: right; vertical-align: bottom;">
+                    <h4 style="font-weight: 700; display:inline-block; width:auto; padding-top: 0.4em; border-top:1px solid #000;">{{ estimate.estimate_total }}</h4>
                 </td>
             </tr>
-            </tfoot>
         </table>
-    {% endif %}
-
-    <h6 style="padding-top: 3em;">Summation</h6>
-    <table class="table small" id="summation">
-        <tr>
-            {% if dealer_parts %}
-                <td class="summation-item">
-                    <p class="subtotal-eyebrow">DEALER PARTS</p>
-                    <h5>{{ estimate.dealer_parts }}</h5>
-                </td>
-            {% endif %}
-            {% if open_market_parts %}
-                <td class="summation-item">
-                    <p class="subtotal-eyebrow">OPEN MARKET</p>
-                    <h5>{{ estimate.open_market_parts }}</h5>
-                </td>
-            {% endif %}
-            {% if contribution_parts %}
-                <td class="summation-item">
-                    <p class="subtotal-eyebrow">CONTRIBUTION</p>
-                    <h5>{{ estimate.contribution_parts }}</h5>
-                </td>
-            {% endif %}
-            {% if other_costs %}
-                <td class="summation-item">
-                    <p class="subtotal-eyebrow">OTHER COSTS</p>
-                    <h5>{{ estimate.other_costs }}</h5>
-                </td>
-            {% endif %}
-            {% if estimate.vattable %}
-                <td class="summation-item">
-                    <p class="subtotal-eyebrow">VAT</p>
-                    <h5>{{ estimate.vat }}</h5>
-                </td>
-            {% endif %}
-            <td>
-            <td style="text-align: right; vertical-align: bottom;">
-                <h4 style="font-weight: 700; display:inline-block; width:auto; padding-top: 0.4em; border-top:1px solid #000;">{{ estimate.estimate_total }}</h4>
-            </td>
-        </tr>
-    </table>
+    </div>
 {% endblock %}

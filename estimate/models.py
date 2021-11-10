@@ -136,21 +136,15 @@ class ContributionPart(Item):
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     contrib_perc = models.IntegerField()
-
-    @property
-    def contrib_amount(self):
-        if not self.negotiated_price:
-            self.negotiated_price = self.unit_price
-        if self.contrib_perc:
-            return (
-                    Decimal(self.contrib_perc / 100) * (self.negotiated_price * self.quantity)
-            ).quantize(Decimal("0.01"))
-        else:
-            return 0
+    contrib_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.negotiated_price:
             self.negotiated_price = self.unit_price
+        # calculate contrib_amount and format result as a quantized Decimal
+        if not self.contrib_perc:
+            self.contrib_perc = 50
+        self.contrib_amount = self.negotiated_price * Decimal(self.contrib_perc / 100).quantize(Decimal("0.01"))
         self.amount = (self.negotiated_price * self.quantity) - self.contrib_amount
         super(ContributionPart, self).save(*args, **kwargs)
 

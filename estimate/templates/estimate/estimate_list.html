@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% block estimate %}
-    {# create a condended bootstrap table listing Estimate instances. The fields are report, estimate_total, dealer_parts, openmarket_parts, contribution_parts and other_costs. If there are no estimates, create an h3 tag with the text No estimates found. Use the report column to link to the estimate instance using get_absolute_url method of the estimate instance #}
-    <h3>{% if estimates %}Estimates{% else %}No estimates found{% endif %}</h3>
-    <table class="table table-condensed table-striped">
-        <thead>
+{% block content %}
+    <div class="container">
+        <h3>{% if estimates %}Estimates{% else %}No estimates found{% endif %}</h3>
+        <table class="table table-condensed table-striped">
+            <thead>
             <tr>
                 <th>Report</th>
                 <th>Estimate Total</th>
@@ -13,8 +13,8 @@
                 <th>Contribution Parts</th>
                 <th>Other Costs</th>
             </tr>
-        </thead>
-        <tbody>
+            </thead>
+            <tbody>
             {% for estimate in estimates %}
                 <tr>
                     <td><a href="{{ estimate.get_absolute_url }}">{{ estimate.report }}</a></td>
@@ -25,7 +25,13 @@
                     <td>{{ estimate.other_costs }}</td>
                 </tr>
             {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
+
+<div>
+    <form method="post">
+    </form>
+</div>
 
 {% endblock %}
