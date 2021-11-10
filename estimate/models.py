@@ -97,7 +97,7 @@ class Estimate(models.Model):
 class Item(PolymorphicModel):
     estimate = models.ForeignKey(Estimate, on_delete=models.PROTECT)
     item = models.CharField(max_length=50)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True)
 
     def __str__(self):
         return self.item
@@ -136,7 +136,9 @@ class ContributionPart(Item):
         max_digits=10, decimal_places=2, null=True, blank=True
     )
     contrib_perc = models.IntegerField()
-    contrib_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    contrib_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True
+    )
 
     def save(self, *args, **kwargs):
         if not self.negotiated_price:
@@ -144,7 +146,8 @@ class ContributionPart(Item):
         # calculate contrib_amount and format result as a quantized Decimal
         if not self.contrib_perc:
             self.contrib_perc = 50
-        self.contrib_amount = self.negotiated_price * Decimal(self.contrib_perc / 100).quantize(Decimal("0.01"))
+        self.contrib_amount = Decimal(self.negotiated_price) * Decimal(self.contrib_perc / 100).quantize(
+            Decimal("0.01"))
         self.amount = (self.negotiated_price * self.quantity) - self.contrib_amount
         super(ContributionPart, self).save(*args, **kwargs)
 

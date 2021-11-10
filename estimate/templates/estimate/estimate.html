@@ -11,7 +11,7 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-    <div class="container">
+    <div class="container small">
         <form method="post">
             {% csrf_token %}
             <div>
@@ -20,7 +20,7 @@
             <div>
                 <h4>Dealer Parts</h4>
                 <div>
-                    {{ dealer_parts | crispy }}
+                   {{ dealer_parts | crispy }}
                 </div>
             </div>
             <div>
@@ -41,7 +41,9 @@
                     {{ other_costs | crispy }}
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <div class="form-actions ">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
         </form>
     </div>
 {% endblock %}

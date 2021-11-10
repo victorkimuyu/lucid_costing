@@ -20,7 +20,7 @@
                 {% for item in dealer_parts %}
                     <tr>
                         <td>{{ forloop.counter }}.</td>
-                        <td>{{ item.description }}</td>
+                        <td>{{ item.item }}</td>
                         <td style="text-align: center;">{{ item.quantity }}</td>
                         <td class="item-cost">{{ item.unit_price }}</td>
                         <td class="item-cost">{{ item.amount }}</td>
@@ -76,10 +76,10 @@
                 {% for item in open_market_parts %}
                     <tr>
                         <td>{{ forloop.counter }}.</td>
-                        <td>{{ item.description }}</td>
+                        <td>{{ item.item }}</td>
                         <td style="text-align: center;">{{ item.quantity }}</td>
                         <td class="item-cost">{{ item.unit_price }}</td>
-                        <td class="item-cost">{{ item.negotiated }}</td>
+                        <td class="item-cost">{{ item.negotiated_price }}</td>
                         <td class="item-cost">{{ item.amount }}</td>
                     </tr>
                 {% endfor %}
@@ -111,17 +111,17 @@
                     <th>Quoted</th>
                     <th>Negotiated</th>
                     <th style="width: 10%; text-align: center;">Contr. %</th>
-                    <th>Amount</th>
+                    <th style="width: 10%; text-align: center;">Contrib.</th>
                     <th>Balance</th>
                 </tr>
                 </thead>
                 {% for item in contribution_parts %}
                     <tr>
                         <td>{{ forloop.counter }}.</td>
-                        <td>{{ item.description }}</td>
+                        <td>{{ item.item }}</td>
                         <td style="text-align: center;">{{ item.quantity }}</td>
                         <td class="item-cost">{{ item.unit_price }}</td>
-                        <td class="item-cost">{{ item.negotiated }}</td>
+                        <td class="item-cost">{{ item.negotiated_price }}</td>
                         <td style="width: 10%; text-align: center;">{{ item.contrib_perc }}</td>
                         <td class="item-cost">{{ item.contrib_amount }}</td>
                         <td class="item-cost">{{ item.amount }}</td>
@@ -159,7 +159,7 @@
                 {% for item in other_costs %}
                     <tr>
                         <td class="item-index">{{ forloop.counter | roman }}.</td>
-                        <td>{{ item.description }}</td>
+                        <td>{{ item.item }}</td>
                         <td class="item-cost">{{ item.amount }}</td>
                     </tr>
                 {% endfor %}

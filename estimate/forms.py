@@ -8,25 +8,42 @@ from .models import Estimate, DealerPart, OpenMarketPart, ContributionPart, Othe
 class EstimateForm(forms.ModelForm):
     class Meta:
         model = Estimate
-        fields = "__all__"
+        fields = ("report", "dealer_discount", "vattable")
+        widgets = {
+            "report": forms.TextInput(attrs={"class": "form-control"}),
+            "dealer_discount": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "min": "1",
+                    "max": "100",
+                }
+            ),
+            "vattable": forms.CheckboxInput(attrs={"class": "form-check-input"}),
+        }
 
 
 # Create DealerPart Form by extending the forms.Form, the fields are item, quantity, an amount
 class DealerPartForm(forms.ModelForm):
-
     class Meta:
         model = DealerPart
         fields = "__all__"
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-control"}),
-            "unit_price": forms.NumberInput(attrs={"class": "form-control"}),
+            "quantity": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "unit_price": forms.NumberInput(
+                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+            ),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
+                attrs={
+                    "class": "form-control",
+                    "min": "1",
+                    "step": "0.01",
+                    "readonly": "readonly",
+                    "required": "",
+                }
             ),
         }
-
-        # Create OpenMarketPart Form by extending the forms.Form, the fields are item, quantity, unit_price and amount
 
 
 class OpenMarketPartForm(forms.ModelForm):
@@ -36,31 +53,71 @@ class OpenMarketPartForm(forms.ModelForm):
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
             "quantity": forms.NumberInput(attrs={"class": "form-control"}),
-            "unit_price": forms.NumberInput(attrs={"class": "form-control"}),
-            "negotiated_price": forms.NumberInput(attrs={"class": "form-control", "required": ""}),
+            "unit_price": forms.NumberInput(
+                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+            ),
+            "negotiated_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "required": "",
+                    "step": "0.01",
+                    "min": "1",
+                }
+            ),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
+                attrs={"class": "form-control", "required": "", "readonly": "readonly", "min": "1", "step": "0.01"}
             ),
         }
+
+    # override full_clean and set negotiated_price to unit_cost if it is not set
+    def clean(self):
+        cleaned_data = super().clean()
+        unit_price = cleaned_data.get("unit_price")
+        negotiated_price = cleaned_data.get("negotiated_price")
+        if unit_price and not negotiated_price:
+            cleaned_data["negotiated_price"] = unit_price
+
+    # override save to set the amount field
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        instance.amount = instance.quantity * instance.negotiated_price
+        if commit:
+            instance.save()
+        return instance
 
 
 # Create ContributionPart Form by extending the forms.Form, the fields are item, quantity, unit_price and amount
 class ContributionPartForm(forms.ModelForm):
-
     class Meta:
         model = ContributionPart
         fields = "__all__"
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-control"}),
-            "unit_price": forms.NumberInput(attrs={"class": "form-control"}),
-            "negotiated_price": forms.NumberInput(attrs={"class": "form-control", "required": ""}),
-            "contrib_perc": forms.NumberInput(attrs={"class": "form-control"}),
+            "quantity": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "unit_price": forms.NumberInput(
+                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+            ),
+            "negotiated_price": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "required": "",
+                    "min": "1",
+                    "step": "0.1",
+                }
+            ),
+            "contrib_perc": forms.NumberInput(
+                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+            ),
             "contrib_amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
+                attrs={
+                    "class": "form-control",
+                    "min": "1",
+                    "step": "0.1",
+                    "readonly": "readonly",
+                }
             ),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
+                attrs={"class": "form-control", "readonly": "readonly", "required": ""}
             ),
         }
 
@@ -73,7 +130,7 @@ class OtherCostForm(forms.ModelForm):
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly"}
+                attrs={"class": "form-control", "min": "1", "step": "0.1"}
             ),
         }
 
