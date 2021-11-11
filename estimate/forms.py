@@ -30,14 +30,27 @@ class DealerPartForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "quantity": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "id": "dealerQty",
+                    "min": "1",
+                    "onchange": "calculateDealerPartAmount()",
+                }
+            ),
             "unit_price": forms.NumberInput(
-                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+                attrs={
+                    "class": "form-control",
+                    "id": "dealerUnitPrice",
+                    "min": "1",
+                    "step": "0.01",
+                    "onchange": "calculateDealerPartAmount()",
+                }
             ),
             "amount": forms.NumberInput(
                 attrs={
                     "class": "form-control",
-                    "min": "1",
+                    "id": "dealerAmount",
                     "step": "0.01",
                     "readonly": "readonly",
                     "required": "",
@@ -52,20 +65,42 @@ class OpenMarketPartForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-control"}),
+            "quantity": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "id": "openMarketQty",
+                    "min": "1",
+                    "onchange": "calculateOpenMarketPartAmount()",
+                }
+            ),
             "unit_price": forms.NumberInput(
-                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+                attrs={
+                    "class": "form-control",
+                    "id": "openMarketUnitPrice",
+                    "min": "1",
+                    "step": "0.01",
+                }
             ),
             "negotiated_price": forms.NumberInput(
                 attrs={
                     "class": "form-control",
+                    "id": "openMarketNegotiatedPrice",
                     "required": "",
                     "step": "0.01",
                     "min": "1",
+                    "onchange": "calculateOpenMarketPartAmount()",
+                    "onexit": "setNegotiatedPrice()",
                 }
             ),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "required": "", "readonly": "readonly", "min": "1", "step": "0.01"}
+                attrs={
+                    "class": "form-control",
+                    "id": "openMarketAmount",
+                    "required": "",
+                    "readonly": "readonly",
+                    "min": "1",
+                    "step": "0.01",
+                }
             ),
         }
 
@@ -86,38 +121,71 @@ class OpenMarketPartForm(forms.ModelForm):
         return instance
 
 
-# Create ContributionPart Form by extending the forms.Form, the fields are item, quantity, unit_price and amount
 class ContributionPartForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["contrib_amount"].label = "Amount"
+        self.fields["contrib_perc"].label = "Cont. %"
+        self.fields["amount"].label = "Balance"
+
     class Meta:
         model = ContributionPart
         fields = "__all__"
         widgets = {
             "item": forms.TextInput(attrs={"class": "form-control"}),
-            "quantity": forms.NumberInput(attrs={"class": "form-control", "min": "1"}),
+            "quantity": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "id": "contribQty",
+                    "min": "1",
+                    "onchange": "contribCalculations()",
+                }
+            ),
             "unit_price": forms.NumberInput(
-                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+                attrs={
+                    "class": "form-control",
+                    "id": "contribUnitPrice",
+                    "min": "1",
+                    "step": "0.01",
+                    "onchange": "contribCalculations()",
+                }
             ),
             "negotiated_price": forms.NumberInput(
                 attrs={
                     "class": "form-control",
+                    "id": "contribNegotiatedPrice",
                     "required": "",
                     "min": "1",
                     "step": "0.1",
+                    "onchange": "contribCalculations()",
                 }
             ),
             "contrib_perc": forms.NumberInput(
-                attrs={"class": "form-control", "min": "1", "step": "0.01"}
+                attrs={
+                    "class": "form-control",
+                    "id": "contribPerc",
+                    "min": "1",
+                    "step": "0.01",
+                    "onchange": "contribCalculations()",
+                }
             ),
             "contrib_amount": forms.NumberInput(
                 attrs={
                     "class": "form-control",
+                    "id": "contribAmount",
+                    "label": "Cont. %",
                     "min": "1",
                     "step": "0.1",
                     "readonly": "readonly",
                 }
             ),
             "amount": forms.NumberInput(
-                attrs={"class": "form-control", "readonly": "readonly", "required": ""}
+                attrs={
+                    "class": "form-control",
+                    "id": "contribBalance",
+                    "readonly": "readonly",
+                    "required": "",
+                }
             ),
         }
 

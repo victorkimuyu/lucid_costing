@@ -94,5 +94,7 @@ class EstimateListView(ListView):
     template_name = "estimate/estimate_list.html"
     context_object_name = "estimates"
 
-    # create pagination for this list
+    def get_queryset(self):
+        return Estimate.objects.filter(user=self.request.user)
+
     paginate_by = 2

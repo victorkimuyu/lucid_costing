@@ -17,25 +17,25 @@
             <div>
                 {{ form | crispy }}
             </div>
-            <div>
+            <div id="dealerSection">
                 <h4>Dealer Parts</h4>
                 <div>
-                   {{ dealer_parts | crispy }}
+                    {{ dealer_parts | crispy }}
                 </div>
             </div>
-            <div>
+            <div id="openMarketSection">
                 <h4>Open Market Parts</h4>
                 <div>
                     {{ openmarket_parts | crispy }}
                 </div>
             </div>
-            <div>
+            <div id="contributionSection">
                 <h4>Contribution Parts</h4>
                 <div>
                     {{ contribution_parts | crispy }}
                 </div>
             </div>
-            <div>
+            <div id="otherCostsSection">
                 <h4>Other Costs</h4>
                 <div>
                     {{ other_costs | crispy }}
@@ -46,4 +46,63 @@
             </div>
         </form>
     </div>
+    <script>
+        function calculateDealerPartAmount(dealerQty, dealerUnitPrice) {
+            dealerQty = document.getElementById("dealerQty").value;
+            dealerUnitPrice = document.getElementById("dealerUnitPrice").value;
+            {# if dealerQty is NaN, set it to 1 #}
+            if (isNaN(dealerQty)) {
+                dealerQty = 1;
+            }
+            if (!isNaN(dealerUnitPrice) && !isNaN(dealerQty)) {
+                document.getElementById("dealerAmount").value = dealerQty * dealerUnitPrice;
+            }
+        }
+
+        function calculateOpenMarketPartAmount(openMarketQty, openMarketUnitPrice, openMarketNegotiatedPrice) {
+            openMarketQty = document.getElementById("openMarketQty").value;
+            openMarketUnitPrice = document.getElementById("openMarketUnitPrice").value;
+            openMarketNegotiatedPrice = document.getElementById("openMarketNegotiatedPrice").value;
+            {# if dealerQty is NaN, set it to 1 #}
+            if (isNaN(openMarketQty)) {
+                openMarketQty = 1;
+            }
+            if (isNaN(openMarketNegotiatedPrice)) {
+                openMarketNegotiatedPrice = openMarketUnitPrice;
+            }
+            document.getElementById("openMarketAmount").value = openMarketQty * openMarketNegotiatedPrice;
+        }
+
+        {# set contrib amount. function arguments are contribQty, contribUnitPrice, contribNegotiatedPrice, contribPerc, and contribAmount #}
+
+        function contribCalculations(contribQty, contribUnitPrice, contribNegotiatedPrice, contribPerc, contribAmount, contribBalance) {
+            contribQty = document.getElementById("contribQty").value;
+            contribUnitPrice = document.getElementById("contribUnitPrice").value;
+            contribNegotiatedPrice = document.getElementById("contribNegotiatedPrice").value;
+            contribPerc = document.getElementById("contribPerc").value / 100;
+            contribAmount = document.getElementById("contribAmount").value;
+            contribBalance = document.getElementById("contribBalance").value;
+            {# if dealerQty is NaN, set it to 1 #}
+            if (isNaN(contribQty)) {
+                contribQty = 1;
+            }
+            if (isNaN(contribNegotiatedPrice)) {
+                contribNegotiatedPrice = contribUnitPrice;
+            }
+            if (isNaN(contribPerc)) {
+                contribPerc = 1;
+            }
+            if (isNaN(contribAmount)) {
+                contribAmount = 1;
+            }
+            contribAmount = (contribQty * contribNegotiatedPrice) * contribPerc;
+            contribBalance = (contribQty * contribNegotiatedPrice) - contribAmount;
+            document.getElementById("contribAmount").value = contribAmount;
+            document.getElementById("contribBalance").value = contribBalance;
+        }
+
+
+
+
+    </script>
 {% endblock %}
